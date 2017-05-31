@@ -1,0 +1,96 @@
+//: Experimenting with using arrays of Booleans for selection of certain DMX channels
+// Swift 4.0
+
+import UIKit
+
+struct DMXdata {
+    var value: [Int]
+    var selection: [Bool]
+    init(value: Int = 0, selection: Bool = false) { // took out 'value: [Int], selection: [Bool]'
+        self.value = [Int](repeating: value, count: 512)
+        self.selection = [Bool](repeating: selection, count: 512)
+    }
+}
+
+var universeOne = DMXdata()
+
+// function for selecting or deselecting specific index's in a universe
+func selectDMXChannels(selType isSelected: Bool, start channelStart: Int, end channelEnd: Int, select selected: [Bool]) -> [Bool] {
+    var chSelect = selected
+    if ( channelStart <= channelEnd){
+        for i in (channelStart...channelEnd){
+            chSelect[i-1] = isSelected
+        }
+        return chSelect
+    }else {
+        for i in (channelEnd...channelStart){
+            chSelect[i-1] = isSelected
+        }
+        return chSelect
+    }
+}
+
+// function for changing the values of all of the specific index's in a universe
+func changeSelectedDMXchan(newVal: Int, sel chSelect: [Bool], dmxVal: [Int]) -> [Int] {
+    let count = (chSelect.count - 1)
+    var tempDMX = dmxVal
+    var isSelected = chSelect
+    for i in (0...count){
+        if isSelected[i] == true{
+            tempDMX[i] = newVal
+        }
+    }
+    return tempDMX
+}
+
+// function for soloing the selected channels (turns all unselected items off)
+func soloSelectedChannels(sel chSelect: [Bool], dmxVal: [Int]) -> [Int] {
+    let count = (chSelect.count - 1)
+    var tempDMX = dmxVal
+    var isSelected = chSelect
+    for i in (0...count){
+        if isSelected[i] == false{ // if this channel is not selected
+            tempDMX[i] = 0          // change it to 0 intensity
+        }
+    }
+    return tempDMX
+}
+
+func sendSerialDMXVals(dmx: [Int]) -> String{
+    var fullString = ""
+    for (index, value) in dmx.enumerated() {
+        // Display indexes and values.
+        var tempString: String
+        tempString = "__Ch:0\(index+1)_Val:\(value)__"
+        fullString = fullString+tempString
+    }
+    return fullString
+}
+
+universeOne.selection = selectDMXChannels(selType: true, start: 12, end: 1, select: universeOne.selection)
+universeOne.selection = selectDMXChannels(selType: false, start: 14, end: 5, select: universeOne.selection)
+universeOne.value = changeSelectedDMXchan(newVal: 255, sel: universeOne.selection, dmxVal: universeOne.value)
+universeOne.selection = selectDMXChannels(selType: true, start: 1, end: 512, select: universeOne.selection)
+universeOne.selection = selectDMXChannels(selType: false, start: 14, end: 5, select: universeOne.selection)
+universeOne.value = changeSelectedDMXchan(newVal: 8, sel: universeOne.selection, dmxVal: universeOne.value)
+var final = sendSerialDMXVals(dmx: universeOne.value)
+
+universeOne.selection = selectDMXChannels(selType: false, start: 42, end: 57, select: universeOne.selection)
+
+universeOne.selection = selectDMXChannels(selType: false, start: 2, end: 512, select: universeOne.selection)
+
+final = sendSerialDMXVals(dmx: universeOne.value)
+
+universeOne.selection = selectDMXChannels(selType: false, start: 1, end: 512, select: universeOne.selection)
+universeOne.selection = selectDMXChannels(selType: true, start: 1, end: 512, select: universeOne.selection)
+universeOne.value = changeSelectedDMXchan(newVal: 0, sel: universeOne.selection, dmxVal: universeOne.value)
+universeOne.value = soloSelectedChannels(sel: universeOne.selection, dmxVal: universeOne.value)
+
+
+
+
+
+
+
+
+
