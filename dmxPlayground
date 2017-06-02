@@ -85,12 +85,3 @@ universeOne.selection = selectDMXChannels(selType: false, start: 1, end: 512, se
 universeOne.selection = selectDMXChannels(selType: true, start: 1, end: 512, select: universeOne.selection)
 universeOne.value = changeSelectedDMXchan(newVal: 0, sel: universeOne.selection, dmxVal: universeOne.value)
 universeOne.value = soloSelectedChannels(sel: universeOne.selection, dmxVal: universeOne.value)
-
-
-
-
-
-
-
-
-
